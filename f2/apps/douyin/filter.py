@@ -151,6 +151,21 @@ class UserPostFilter(JSONModel):
         ids = self._get_list_attr_value("$.aweme_list[*].aweme_id")
         return ids if isinstance(ids, list) else [ids]
 
+    # dailei begin
+    # 点赞数
+    @property
+    def aweme_digg_count(self):
+        return self._get_list_attr_value("$.aweme_list[*].statistics.digg_count")
+    # 评论数
+    @property
+    def aweme_comment_count(self):
+        return self._get_list_attr_value("$.aweme_list[*].statistics.comment_count")
+    # 收藏数
+    @property
+    def aweme_collect_count(self):
+        return self._get_list_attr_value("$.aweme_list[*].statistics.collect_count")
+    # dailei end
+
     @property
     def aweme_type(self):
         return self._get_list_attr_value("$.aweme_list[*].aweme_type")

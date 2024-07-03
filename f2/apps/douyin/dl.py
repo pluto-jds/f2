@@ -238,12 +238,21 @@ class DouyinDownloader(BaseDownloader):
 
             # 处理不同类型的作品下载任务
             if aweme_type in [0, 55, 61, 109, 201]:
+                """
                 video_name = (
                     format_file_name(
                         kwargs.get("naming", "{create}_{desc}"), aweme_data_dict
                     )
                     + "_video"
                 )
+                """
+                video_name = "{0}_{1}_{2}_{3}_{4}_video".format(aweme_data_dict.get('create_time'), aweme_data_dict.get("desc"),
+                    aweme_data_dict.get("aweme_digg_count"),
+                    aweme_data_dict.get("aweme_comment_count"),
+                    aweme_data_dict.get("aweme_collect_count"),)
+                
+                print("***************{}*************".format(video_name))
+                
                 # video_play_addr 现在为一个list，第一个链接下载失败，则下载第二个链接
                 video_url = aweme_data_dict.get("video_play_addr")
                 if video_url != None:
