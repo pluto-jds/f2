@@ -8,6 +8,17 @@ from f2.log.logger import logger
 from f2.i18n.translator import _
 from f2.utils.decorators import mode_handler, mode_function_map
 
+from urllib.parse import urlparse, parse_qs
+import sys
+def extract_modal_id(url):
+    # 解析URL
+    parsed_url = urlparse(url)
+    # 获取查询参数
+    query_params = parse_qs(parsed_url.query)
+    # 提取modal_id
+    modal_id = query_params.get('modal_id', [None])[0]
+    return modal_id
+
 # from f2.utils.utils import split_set_cookie
 from f2.apps.douyin.db import AsyncUserDB, AsyncVideoDB
 from f2.apps.douyin.crawler import DouyinCrawler, DouyinWebSocketCrawler
@@ -181,6 +192,42 @@ class DouyinHandler:
         Args:
             kwargs: dict: 参数字典 (Parameter dictionary)
         """
+        max_cursor = self.kwargs.get("max_cursor", 0)
+        page_counts = self.kwargs.get("page_counts", 20)
+        max_counts = self.kwargs.get("max_counts")
+        #aweme_id = await AwemeIdFetcher.get_aweme_id(self.kwargs.get("url"))
+        
+        url_str = self.kwargs.get("url")
+        print("url_str:", url_str)
+        modal_id = extract_modal_id(url_str)
+        print("modid:", modal_id)
+        
+        sec_user_id = await SecUserIdFetcher.get_sec_user_id(self.kwargs.get("url"))
+        async with AsyncUserDB("douyin_users.db") as udb:
+            user_path = await self.get_or_add_user_data(self.kwargs, sec_user_id, udb)
+            
+        async for aweme_data_list in self.fetch_user_post_videos(
+            sec_user_id, max_cursor, page_counts, max_counts
+        ):
+            # 创建下载任务
+            aweme_data_list_info = aweme_data_list._to_list()
+            for item in aweme_data_list_info:
+                 if item['aweme_id'] == modal_id:
+                     aweme_data_single_list = [item]
+                     await self.downloader.create_download_tasks(
+                        self.kwargs, aweme_data_single_list, user_path)
+            sys.exit(0)
+
+    '''
+    @mode_handler("one")
+    async def handle_one_video(self):
+        """
+        用于处理单个作品。
+        (Used to process a single video.)
+
+        Args:
+            kwargs: dict: 参数字典 (Parameter dictionary)
+        """
 
         aweme_id = await AwemeIdFetcher.get_aweme_id(self.kwargs.get("url"))
 
@@ -202,7 +249,7 @@ class DouyinHandler:
         await self.downloader.create_download_tasks(
             self.kwargs, aweme_data._to_dict(), user_path
         )
-
+    '''
     async def fetch_one_video(
         self,
         aweme_id: str,
