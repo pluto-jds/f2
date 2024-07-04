@@ -130,7 +130,7 @@ class DouyinDownloader(BaseDownloader):
         if not aweme_datas_list:
             logger.warning(_("没有找到符合条件的作品"))
             await self.close()
-            sys.exit(0)
+            return
 
         # 创建下载任务
         for aweme_data in aweme_datas_list:
