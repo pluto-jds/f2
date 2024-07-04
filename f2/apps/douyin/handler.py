@@ -213,11 +213,10 @@ class DouyinHandler:
             aweme_data_list_info = aweme_data_list._to_list()
             for item in aweme_data_list_info:
                  if item['aweme_id'] == modal_id:
-                     aweme_data_single_list = [item]
-                     await self.downloader.create_download_tasks(
+                    aweme_data_single_list = [item]
+                    await self.downloader.create_download_tasks(
                         self.kwargs, aweme_data_single_list, user_path)
-            sys.exit(0)
-
+                    sys.exit(0)
     '''
     @mode_handler("one")
     async def handle_one_video(self):
