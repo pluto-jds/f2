@@ -22,6 +22,7 @@ from f2.utils._dl import (
     get_chunk_size,
     get_segments_from_m3u8,
 )
+import time
 
 # 最大片段缓存数量，超过这个数量就会进行清理
 # (Maximum segment cache count, clear when it exceeds this count)
@@ -120,6 +121,8 @@ class BaseDownloader(BaseCrawler):
 
             # 遍历所有链接 (Iterate over all links)
             for link in urls:
+                time.sleep(1)
+                print("try sleep 1 second")
                 # 获取文件内容大小 (Get the size of the file content)
                 content_length = await get_content_length(
                     link,
