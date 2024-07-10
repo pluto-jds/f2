@@ -5,7 +5,7 @@ import json
 import asyncio
 import traceback
 import websockets
-
+import time
 from httpx import Response
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 
@@ -322,6 +322,7 @@ class BaseCrawler:
             response: 响应内容 (Response content)
         """
         try:
+            time.sleep(1)
             response = await self.aclient.head(url)
             logger.debug(_("响应状态码: {0}").format(response.status_code))
             response.raise_for_status()
