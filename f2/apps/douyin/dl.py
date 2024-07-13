@@ -269,7 +269,7 @@ class DouyinDownloader(BaseDownloader):
                     head_name = "{0}_".format(aweme_data_dict.get('create_time'))
                     head_name_len = len(head_name.encode('utf-8')) 
                     
-                    tail_name = "_{2}_{3}_{4}_video".format(aweme_data_dict.get("aweme_digg_count"),
+                    tail_name = "_{0}_{1}_{2}_video".format(aweme_data_dict.get("aweme_digg_count"),
                     aweme_data_dict.get("aweme_comment_count"),
                     aweme_data_dict.get("aweme_collect_count"),)
                     tail_name_len = len(tail_name.encode('utf-8'))
