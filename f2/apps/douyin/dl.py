@@ -11,6 +11,18 @@ from f2.utils.utils import get_timestamp, timestamp_2_str
 from f2.apps.douyin.db import AsyncUserDB
 from f2.apps.douyin.utils import format_file_name, json_2_lrc
 
+def truncate_utf8_string(s, max_bytes):
+    """Truncate a UTF-8 string to a given byte length without breaking characters."""
+    utf8_bytes = s.encode('utf-8')
+    if len(utf8_bytes) <= max_bytes:
+        return s
+    
+    # Truncate to the last valid character within the limit
+    truncated = utf8_bytes[:max_bytes]
+    while truncated[-1] >> 6 == 0b10:  # While the last byte is a continuation byte (0b10xxxxxx)
+        truncated = truncated[:-1]
+    
+    return truncated.decode('utf-8', 'ignore')
 
 class DouyinDownloader(BaseDownloader):
     def __init__(self, kwargs: dict = {}):
@@ -252,6 +264,23 @@ class DouyinDownloader(BaseDownloader):
                     aweme_data_dict.get("aweme_collect_count"),)
                 
                 print("***************{}*************".format(video_name))
+                
+                if len(video_name.encode('utf-8')) > 250:
+                    head_name = "{0}_".format(aweme_data_dict.get('create_time'))
+                    head_name_len = len(head_name.encode('utf-8')) 
+                    
+                    tail_name = "_{2}_{3}_{4}_video".format(aweme_data_dict.get("aweme_digg_count"),
+                    aweme_data_dict.get("aweme_comment_count"),
+                    aweme_data_dict.get("aweme_collect_count"),)
+                    tail_name_len = len(tail_name.encode('utf-8'))
+
+                    max_hanzi_len = 250 - head_name_len - tail_name_len
+                    hanzi_name = aweme_data_dict.get("desc")
+                    hanzi_new_name = truncate_utf8_string(hanzi_name, max_hanzi_len)
+                    video_new_name = head_name + hanzi_name + tail_name
+                    video_new_name_len = len(video_new_name.encode('utf-8'))
+                    print(f"\n\n Renamed \n{video_name} \n{video_new_name} \nnew len = {video_new_name_len}")
+                    video_name = video_new_name
                 
                 # video_play_addr 现在为一个list，第一个链接下载失败，则下载第二个链接
                 video_url = aweme_data_dict.get("video_play_addr")
